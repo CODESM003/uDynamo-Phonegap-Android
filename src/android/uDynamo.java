@@ -108,6 +108,8 @@ public class uDynamo extends CordovaPlugin {
 
         InitializeData();
 
+        cordova.getActivity().getApplicationContext().registerReceiver(mNoisyAudioStreamReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+
         mIntCurrentVolume = mAudioMgr.getStreamVolume(AudioManager.STREAM_MUSIC);
 
         connectAudio();
@@ -305,13 +307,11 @@ public class uDynamo extends CordovaPlugin {
                         break;
                     case MagTekSCRA.DEVICE_MESSAGE_DATA_START:
                         if (msg.obj != null) {
-                            debugMsg("Transfer started");
                             return true;
                         }
                         break;
                     case MagTekSCRA.DEVICE_MESSAGE_DATA_CHANGE:
                         if (msg.obj != null) {
-                            debugMsg("Transfer ended");
                             closeDevice();
                             sendCardData();
                             msg.obj = null;
@@ -341,7 +341,6 @@ public class uDynamo extends CordovaPlugin {
     public class NoisyAudioStreamReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            debugMsg("noisy?");
             /* If the device is unplugged, this will immediately detect that action,
              * and close the device.
     		 */
@@ -360,7 +359,6 @@ public class uDynamo extends CordovaPlugin {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            debugMsg("headSet called:"+mbAudioConnected);
 
             try {
                 String action = intent.getAction();
@@ -368,7 +366,7 @@ public class uDynamo extends CordovaPlugin {
                 if ((action.compareTo(Intent.ACTION_HEADSET_PLUG)) == 0) {  //if the action match a headset one
                     int headSetState = intent.getIntExtra("state", 0);      //get the headset state property
                     int hasMicrophone = intent.getIntExtra("microphone", 0);//get the headset microphone property
-                    debugMsg("headerphone action? : " + action);
+
                     if ((headSetState == 1) && (hasMicrophone == 1)) {       //headset was unplugged & has no microphone
                         mbAudioConnected = true;
                     } else {
