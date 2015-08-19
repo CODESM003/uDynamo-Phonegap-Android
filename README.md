@@ -39,7 +39,7 @@ It actually checks if anything is plugged in the headphone jack but should be ok
     }
 
     var failure = function(response) {
-        if(!response) {
+        if(response === 'Error') {
             alert("device is not connected"); // better to check for this with 'isDeviceConnected'
             return;
         }
